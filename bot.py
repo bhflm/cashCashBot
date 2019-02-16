@@ -1,6 +1,7 @@
 import logging
 import telebot
 import time
+from csv_reader import *
 from handlers import *
 from keys import TOKEN
 from consts import LINK,BANELCO
@@ -16,7 +17,9 @@ def main():
     bot = telebot.TeleBot(token=TOKEN)
     set_handlers(bot)
 
-    bot.polling()
+    csv_reader = csvReader('cajeros-automaticos.csv', delimiter = ' ', quotechar = '|')
+    csv_reader.read_csv()
 
+    bot.polling()
 
 main()

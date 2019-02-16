@@ -1,45 +1,29 @@
-import json
-import requests
-import pydash
 import logging
-from keys import URL
+import telebot
+import time
+from keys import TOKEN
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+
+#Enable logging facilities
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    level=logging.INFO)
+
+logger = logging.getLogger(__name__)
+
+bot = telebot.TeleBot(token=TOKEN)
+
+def valid_atm(msg):
+    return msg == 'link' or msg == 'banelco'
+
+@bot.message_handler(commands=['start'])
+
+@bot.message_handler(func = lambda msg: msg.text is not None)
+def at_answer(message):
+    user_input = message.text.lower()
+    if (valid_atm(user_input)):
+        bot.reply_to(message, 'Great! Gonna look for the nearests {} around'.format(user_input))
+    else:
+        bot.reply_to(message, 'Sorry, i could not understand "{}", try either asking for a Link or Banelco ATM.'.format(user_input))
 
 
-def get_url(url):
-    print('get_url')
-
-    response = requests.get(url)
-    content = response.content.decode("utf8")
-
-    print(content)
-    return content
-
-def get_json_from_url(url):
-    content = get_url(url)
-    js = json.loads(content)
-    return js
-
-def get_updates():
-    url = URL + "get_updates"
-    js = get_json_from_url(URL)
-    return js
-
-def get_last_chat_id_text(updates):
-    print(updates)
-    
-    num_updates = len(updates["result"])
-    last_update = num_updates - 1
-    text = updates["result"][last_update]["message"]["text"]
-    chat_id = updates["result"][last_update]["message"]["chat"]["id"]
-
-    print (text)
-    print(chat_id)
-
-    return (text, chat_id)
-
-def send_message(text, chat_id):
-    url = URL + "sendMessage?text={}&chat_id={}".format(text, chat_id)
-    get_url(url)
-
-text, chat = get_last_chat_id_and_text(get_updates())
-send_message(text, chat)
+bot.polling()

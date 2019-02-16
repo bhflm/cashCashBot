@@ -2,4 +2,7 @@ from csv_reader import *
 
 
 
-class atms():
+class ATMs():
+
+    def __init__(self):
+        

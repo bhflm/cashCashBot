@@ -1,0 +1,2 @@
+BANELCO = 'Banelco'
+LINK = 'Link'

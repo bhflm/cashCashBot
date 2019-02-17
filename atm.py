@@ -1,12 +1,13 @@
 import logging
 import telegram
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+import numpy as np
+import pandas as pd
+from utils import *
 from keys import TOKEN
 from consts import BANELCO,LINK,FILE_PATH, INVALID_INPUT
 from csv_reader import csvReader
-import numpy as np
-import pandas as pd
 from scipy.spatial import KDTree
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 #Enable logging facilities
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s -%(message)s',level=logging.INFO)
@@ -39,11 +40,19 @@ class ATMSearcher():
         except KeyError:
             return False
 
+    def search_closest_atms(self,atm):
+        logging.info("GETTING CLOSEST {} ATMs NEAR {}".format(atm,self.user_location))
+        # pos = list(self.user_location.values())
+        pos = [-58.37097270, -34.60459180]
+        possible_atms = self.atms_tree.query_pairs(2000)
+        # print(self.atms_tree.data)
+        print(possible_atms)
+
     def get_valid_atm(self, bot, update):
         atm_network = self.is_valid_input(update.message.text)
         if (atm_network):
             logging.info("REQUEST FOR RETRIEVING {} ATM'S ".format(atm_network))
-            # print(self.user_location)
+            a = self.search_closest_atms(atm_network)
 
         else:
             bot.send_message(chat_id=update.message.chat_id,
@@ -62,7 +71,8 @@ class ATMSearcher():
 
     def map_dict_to_kdtree(self, atms_dict):
         mapped_data = list(map(list,list(atms_dict.keys())))
-        return KDTree(mapped_data, leafsize = 3)
+        # print(mapped_data)
+        return KDTree(mapped_data, leafsize = 2)
 
     def run(self):
         self.updater.start_polling()

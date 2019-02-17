@@ -46,18 +46,12 @@ class ATMSearcher():
         reader = csvReader(FILE_PATH, delimiter = '', quotechar = '|')
         reader.process_csv(atms_dict)
 
-    def print_data(each):
-        print('hola')
-        print(each)
-
     def map_dict_to_kdtree(self, atms_dict):
         mapped_data = list(map(list,list(atms_dict.keys())))
         return KDTree(mapped_data, leafsize = 3)
 
     def is_a_valid_atm(self, id):
         pass
-
-
 
     def start(self):
         self.updater.start_polling()

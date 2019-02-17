@@ -2,15 +2,14 @@ import logging
 import telegram
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from keys import TOKEN
-from consts import BANELCO,LINK,FILE_PATH
+from consts import BANELCO,LINK,FILE_PATH, INVALID_INPUT
 from csv_reader import csvReader
 import numpy as np
 import pandas as pd
 from scipy.spatial import KDTree
 
 #Enable logging facilities
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s -%(message)s',level=logging.INFO)
 
 class ATMSearcher():
     def __init__(self):
@@ -19,11 +18,10 @@ class ATMSearcher():
         self.atms_dict = {}
         self.read_csv(self.atms_dict)
         self.atms_tree = self.map_dict_to_kdtree(self.atms_dict)
-
+        self.user_location = {}
         self.dispatcher.add_handler(CommandHandler('start', self.start))
         self.dispatcher.add_handler(MessageHandler(Filters.location, self.get_user_location))
         self.dispatcher.add_handler(MessageHandler(Filters.text, self.get_valid_atm))
-
 
     def start(self, bot, update):
         logging.info('STARTED BOT')
@@ -34,19 +32,28 @@ class ATMSearcher():
                          text=welcome_message,
                          reply_markup=reply_markup)
 
-    def is_valid_atm(self, input):
+    def is_valid_input(self, input):
         target = input.lower().capitalize()
-        #filtrar cuando no es alguno de los 2
-        return { BANELCO : 'Banelco', LINK : 'Link'}[target]
+        try:
+            return { BANELCO : 'Banelco', LINK : 'Link'}[target]
+        except KeyError:
+            return False
 
     def get_valid_atm(self, bot, update):
-        atm_network = update.message.text
-        print(self.is_valid_atm(atm_network))
+        atm_network = self.is_valid_input(update.message.text)
+        if (atm_network):
+            logging.info("REQUEST FOR RETRIEVING {} ATM'S ".format(atm_network))
+            # print(self.user_location)
+
+        else:
+            bot.send_message(chat_id=update.message.chat_id,
+                             text=INVALID_INPUT.format(update.message.text))
+
 
     def get_user_location(self, bot, update):
         logging.info('GETTING USER LOCATION')
-        user_coords = { 'lat' : update.message.location.latitude, 'long' : update.message.location.longitude }
-        print(user_coords['lat'],user_coords['long'])
+        self.user_location = { 'lat' : update.message.location.latitude, 'long' : update.message.location.longitude }
+        bot.send_message(chat_id=update.message.chat_id, text="Thanks, try searching for 'Banelco' or 'Link'!")
 
     def read_csv(self,atms_dict):
         logging.info('PROCESSING CSV')

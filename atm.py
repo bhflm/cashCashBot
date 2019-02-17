@@ -2,9 +2,9 @@ import logging
 import telegram
 import numpy as np
 import pandas as pd
-from utils import map_df, generate_kdtree, dist, mts_between_atms, location_to_xyz
+from utils import *
 from keys import TOKEN
-from consts import BANELCO,LINK,FILE_PATH, INVALID_INPUT
+from consts import BANELCO,LINK,FILE_PATH, INVALID_INPUT, NO_AVAILABLE_ATMS_AROUND
 from csv_reader import csvReader
 from scipy.spatial import KDTree
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
@@ -35,55 +35,36 @@ class ATMSearcher():
                          text=welcome_message,
                          reply_markup=reply_markup)
 
-    def is_valid_input(self, input):
-        target = input.lower().capitalize()
-        try:
-            return { BANELCO : 'Banelco', LINK : 'Link'}[target]
-        except KeyError:
-            return False
-
     def search_closest_atms(self,atm):
         logging.info("GETTING CLOSEST {} ATMs NEAR {}".format(atm,self.user_location))
 
         user_xyz = location_to_xyz(self.user_location)
-        #con el arbol y la ubicacion le tiro la query al arbol para que me devuelva los n mas cercanos
-        near_atms = self.atms_tree.query(user_xyz,10)
-        print(near_atms)
+        kdtree_query = list(self.atms_tree.query(user_xyz,10)[1])
 
-        # print(self.atms_tree)
-        # print(self.atms_df)
+        all_near_atms = list(map(lambda each: {'long': self.atms_df['long'][each], 'lat': self.atms_df['lat'][each], 'red': self.atms_df['red'][each]},kdtree_query))
 
-        # df = generate_df_for_kdtree(self.atms_dict)
-        # coordinates = list(zip(df['x'], df['y'], df['z']))
-        # print(coordinates[0])
-
-
-
-        #una vez que tengo los ids de os mas cercanos (near_atms[1]) los busco en el df
-
-
-        # foodist = list(map(dist,foo[0]))
-        # print(coordinates[0])
-        # possible_atms = list(foo[1])
-        # print(possible_atms)
-        # print(self.atms_dict.items())
-        #print(df['lat'][0],df['long'][0])
-        # -34.605812942035 -58.3709017854754
-        #print(df['lat'][1],df['long'][1])
-        # -34.6050839250446 -58.3709757833981
-        #foobar = mts_between_atms((df['lat'][0],df['long'][0]),(df['lat'][1],df['long'][1]))
+        return filter_possible_atms(all_near_atms, atm, self.user_location)
 
 
     def get_valid_atm(self, bot, update):
-        atm_network = self.is_valid_input(update.message.text)
+        atm_network = is_valid_input(update.message.text)
         if (atm_network):
             logging.info("REQUEST FOR RETRIEVING {} ATM'S ".format(atm_network))
-            a = self.search_closest_atms(atm_network)
+            closest_atms = self.search_closest_atms(atm_network)
+            print(closest_atms)
+            # filter_atms_by_transactions(closest_atms)
+            # return
+
+            if not closest_atms:
+                    logging.info('COULD NOT RETRIEVE ATMs WITHIN DISTANCE')
+                    bot.send_message(chat_id=update.message.chat_id,
+                                     text=NO_AVAILABLE_ATMS_AROUND)
+
+            print(closest_atms)
 
         else:
             bot.send_message(chat_id=update.message.chat_id,
                              text=INVALID_INPUT.format(update.message.text))
-
 
     def get_user_location(self, bot, update):
         logging.info('GETTING USER LOCATION')

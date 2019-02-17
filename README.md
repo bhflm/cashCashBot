@@ -1,2 +1,2 @@
 # cashCashBot
-telegram bot that provides info about nearests atms (banelco / link)
+telegram bot that provides info about nearest atms (banelco / link)

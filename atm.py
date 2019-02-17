@@ -2,7 +2,7 @@ import logging
 import telegram
 import numpy as np
 import pandas as pd
-from utils import *
+from utils import map_df, generate_kdtree, dist, mts_between_atms, location_to_xyz
 from keys import TOKEN
 from consts import BANELCO,LINK,FILE_PATH, INVALID_INPUT
 from csv_reader import csvReader
@@ -18,8 +18,10 @@ class ATMSearcher():
         self.dispatcher = self.updater.dispatcher
         self.atms_dict = {}
         self.read_csv(self.atms_dict)
-        self.atms_tree = self.map_dict_to_kdtree(self.atms_dict)
+        self.atms_df = map_df(self.atms_dict)
+        self.atms_tree = generate_kdtree(self.atms_df)
         self.user_location = {}
+
         self.dispatcher.add_handler(CommandHandler('start', self.start))
         self.dispatcher.add_handler(MessageHandler(Filters.location, self.get_user_location))
         self.dispatcher.add_handler(MessageHandler(Filters.text, self.get_valid_atm))
@@ -42,11 +44,35 @@ class ATMSearcher():
 
     def search_closest_atms(self,atm):
         logging.info("GETTING CLOSEST {} ATMs NEAR {}".format(atm,self.user_location))
-        # pos = list(self.user_location.values())
-        pos = [-58.37097270, -34.60459180]
-        possible_atms = self.atms_tree.query_pairs(2000)
-        # print(self.atms_tree.data)
-        print(possible_atms)
+
+        user_xyz = location_to_xyz(self.user_location)
+        #con el arbol y la ubicacion le tiro la query al arbol para que me devuelva los n mas cercanos
+        near_atms = self.atms_tree.query(user_xyz,10)
+        print(near_atms)
+
+        # print(self.atms_tree)
+        # print(self.atms_df)
+
+        # df = generate_df_for_kdtree(self.atms_dict)
+        # coordinates = list(zip(df['x'], df['y'], df['z']))
+        # print(coordinates[0])
+
+
+
+        #una vez que tengo los ids de os mas cercanos (near_atms[1]) los busco en el df
+
+
+        # foodist = list(map(dist,foo[0]))
+        # print(coordinates[0])
+        # possible_atms = list(foo[1])
+        # print(possible_atms)
+        # print(self.atms_dict.items())
+        #print(df['lat'][0],df['long'][0])
+        # -34.605812942035 -58.3709017854754
+        #print(df['lat'][1],df['long'][1])
+        # -34.6050839250446 -58.3709757833981
+        #foobar = mts_between_atms((df['lat'][0],df['long'][0]),(df['lat'][1],df['long'][1]))
+
 
     def get_valid_atm(self, bot, update):
         atm_network = self.is_valid_input(update.message.text)
@@ -69,10 +95,6 @@ class ATMSearcher():
         reader = csvReader(FILE_PATH, delimiter = '', quotechar = '|')
         reader.process_csv(atms_dict)
 
-    def map_dict_to_kdtree(self, atms_dict):
-        mapped_data = list(map(list,list(atms_dict.keys())))
-        # print(mapped_data)
-        return KDTree(mapped_data, leafsize = 2)
 
     def run(self):
         self.updater.start_polling()

@@ -21,6 +21,6 @@ class csvReader():
             atms_data = csv.DictReader(csvfile)
             for row in atms_data:
                 transactions = 0
-                key = (float(row['long']),float(row['lat']))
-                values = [self.map_network(row['red']),row['banco'],row['ubicacion'],row['terminales'],row['calle'],row['altura'], transactions]
+                key = (float(row['long']),float(row['lat']),self.map_network(row['red']))
+                values = [row['red'],row['banco'],row['ubicacion'],row['terminales'],row['calle'],row['altura'], transactions]
                 data_dict[key] = values

@@ -5,6 +5,7 @@ from keys import TOKEN
 from consts import BANELCO,LINK,FILE_PATH
 from csv_reader import csvReader
 import numpy as np
+import pandas as pd
 from scipy.spatial import KDTree
 
 #Enable logging facilities
@@ -45,9 +46,13 @@ class ATMSearcher():
         reader = csvReader(FILE_PATH, delimiter = '', quotechar = '|')
         reader.process_csv(atms_dict)
 
+    def print_data(each):
+        print('hola')
+        print(each)
+
     def map_dict_to_kdtree(self, atms_dict):
-        data = atms_dict.items()
-        # return KDTree(data)
+        mapped_data = list(map(list,list(atms_dict.keys())))
+        return KDTree(mapped_data, leafsize = 3)
 
     def is_a_valid_atm(self, id):
         pass

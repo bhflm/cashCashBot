@@ -1,25 +1,8 @@
-import logging
-import telebot
-import time
+from atm import ATMSearcher
 from csv_reader import *
-from handlers import *
-from keys import TOKEN
-from consts import LINK,BANELCO
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from consts import *
 
-#Enable logging facilities
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
-
-def main():
-
-    logger = logging.getLogger(__name__)
-    bot = telebot.TeleBot(token=TOKEN)
-    set_handlers(bot)
-
-    csv_reader = csvReader('cajeros-automaticos.csv', delimiter = ' ', quotechar = '|')
-    csv_reader.read_csv()
-
-    bot.polling()
-
-main()
+if __name__ == '__main__':
+    cashCash = ATMSearcher()
+    cashCash.start()
+print("Running Bot...")

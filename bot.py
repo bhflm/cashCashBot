@@ -5,4 +5,3 @@ from consts import *
 if __name__ == '__main__':
     cashCash = ATMSearcher()
     cashCash.start()
-print("Running Bot...")

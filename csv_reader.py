@@ -12,9 +12,11 @@ class csvReader():
         if row['localidad'] == 'CABA':
             return {col: row[col] for col in columns}
 
-    def process_csv(self):
+    def process_csv(self, data_dict):
         with open(self.file, 'r') as csvfile:
             atms_data = csv.DictReader(csvfile)
             for row in atms_data:
-                print(self.row_filter(row))
-                
+                transactions = 0
+                key = (row['long'],row['lat'])
+                values = [row['banco'],row['red'],row['ubicacion'],row['terminales'],row['calle'],row['altura'], transactions]
+                data_dict[key] = values

@@ -8,15 +8,26 @@ from scipy.spatial import KDTree
 # da real mvp: https://stackoverflow.com/questions/43020919/scipy-how-to-convert-kd-tree-distance-from-query-to-kilometers-python-pandas
 
 
+def generate_reply(atms_info):
+    """
+    Se deben listar como MAXIMO 3 cajeros
+    De cada cajero se deben informar direccion y respectivo banco.
+    """
+    message = "Here're nearby ATMS for you: \n\n"
+
+    #['LINK', 'BANCO DE LA CIUDAD DE BUENOS AIRES', 'Av. Fco. Beiró 5327', '3', 'Av. Fco. Beiró', '5327', 0]
+    for atm in atms_info:
+        bank = atm[1]
+        dir = atm[2]
+        additional_atm = 'Name: {}, address:{} \n\n'.format(bank,dir)
+        message += additional_atm
+
+    return message
+
 def filter_atm_by_distance(atm, user_location):
     return mts_between_atms((atm['lat'],atm['long']),(user_location['lat'],user_location['long'])) < 500
 
 def mts_between_atms(coords_1,coords_2):
-    print('atm coords')
-    print(coords_1)
-    print('user coords')
-    print(coords_2)
-
     return geopy.distance.vincenty(coords_1, coords_2).meters
 
 def filter_possible_atms(all_near_atms,chosen_atm, user_location):

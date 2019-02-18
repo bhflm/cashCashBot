@@ -1,3 +1,4 @@
+MAPS_API_URL = 'https://maps.googleapis.com/maps/api/staticmap?'
 FILE_PATH = 'cajeros-automaticos.csv'
 BANELCO = 'Banelco'
 LINK = 'Link'

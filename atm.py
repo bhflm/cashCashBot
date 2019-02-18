@@ -47,8 +47,6 @@ class ATMSearcher():
 
 
     def retrieve_atms_info(self, atms):
-        # self.atms_dict (-58.3625690725868, -34.6112139058569, 0) - long, lat, red
-        # self.atms_df lat long red
         dict_keys = list(map(lambda each: (each['long'],each['lat'],each['red']),atms))
         atms_info = list(map(lambda each: self.atms_dict[each],dict_keys))
         return atms_info

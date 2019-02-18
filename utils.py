@@ -5,27 +5,19 @@ from consts import *
 from math import *
 from scipy.spatial import KDTree
 
-# da real mvp: https://stackoverflow.com/questions/43020919/scipy-how-to-convert-kd-tree-distance-from-query-to-kilometers-python-pandas
-
-
 def generate_reply(atms_info):
-    """
-    Se deben listar como MAXIMO 3 cajeros
-    De cada cajero se deben informar direccion y respectivo banco.
-    """
-    message = "Here're nearby ATMS for you: \n\n"
+    message = "Here're nearby ATMS for you:\n\n"
 
-    #['LINK', 'BANCO DE LA CIUDAD DE BUENOS AIRES', 'Av. Fco. Beiró 5327', '3', 'Av. Fco. Beiró', '5327', 0]
     for atm in atms_info:
         bank = atm[1]
         dir = atm[2]
-        additional_atm = 'Name: {}, address:{} \n\n'.format(bank,dir)
+        additional_atm = 'Name: {}\nAddress: {}\n\n'.format(bank,dir)
         message += additional_atm
 
     return message
 
 def filter_atm_by_distance(atm, user_location):
-    return mts_between_atms((atm['lat'],atm['long']),(user_location['lat'],user_location['long'])) < 500
+    return mts_between_atms((atm['lat'],atm['long']),(user_location['lat'],user_location['long'])) < MAX_DISTANCE
 
 def mts_between_atms(coords_1,coords_2):
     return geopy.distance.vincenty(coords_1, coords_2).meters
@@ -34,11 +26,11 @@ def filter_possible_atms(all_near_atms,chosen_atm, user_location):
     code = map_atm_code(str(chosen_atm).upper())
 
     #JUST FOR TESTING
-    #JUST FOR TESTING
     spoof_location = { 'long' : -58.5250309541001 , 'lat': -34.6137051686962 }
+    #JUST FOR TESTING
 
     atms_with_code = list(filter(lambda atm: (atm['red'] == code), all_near_atms))
-    atms_within_distance = list(filter(lambda atm: filter_atm_by_distance(atm,spoof_location), atms_with_code))  # ORIGINAL : user_location), atms_with_code))
+    atms_within_distance = list(filter(lambda atm: filter_atm_by_distance(atm,spoof_location), atms_with_code))  # PROD: user_location), atms_with_code))
 
     return atms_within_distance
 
@@ -60,14 +52,11 @@ def deg2rad(degree):
     return(rad)
 
 def dist(x):
-    R = 6367 # earth radius
     gamma = 2*np.arcsin(deg2rad(x/(2*R))) # compute the angle of the isosceles triangle
     dist = (2*R*sin(gamma/2)) # compute the side of the triangle
     return(dist)
 
 def to_Cartesian(lat, lng):
-    R = 6367 # radius of the Earth in kilometers
-
     x = R * cos(lat) * cos(lng)
     y = R * cos(lat) * sin(lng)
     z = R * sin(lat)

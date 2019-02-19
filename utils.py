@@ -7,7 +7,6 @@ from scipy.spatial import KDTree
 
 def generate_reply(atms_info):
     message = "Here're nearby ATMS for you:\n\n"
-
     for atm in atms_info:
         bank = atm[1]
         dir = atm[2]
@@ -24,14 +23,8 @@ def mts_between_atms(coords_1,coords_2):
 
 def filter_possible_atms(all_near_atms,chosen_atm, user_location):
     code = map_atm_code(str(chosen_atm).upper())
-
-    #JUST FOR TESTING
-    #spoof_location = { 'long' : -58.5250309541001 , 'lat': -34.6137051686962 }
-    #JUST FOR TESTING
-
     atms_with_code = list(filter(lambda atm: (atm['red'] == code), all_near_atms))
     atms_within_distance = list(filter(lambda atm: filter_atm_by_distance(atm,user_location), atms_with_code))
-
     return atms_within_distance
 
 def is_valid_input(input):
@@ -73,3 +66,9 @@ def map_df(atms_dict):
 def generate_kdtree(df):
     coordinates = list(zip(df['x'], df['y'], df['z']))
     return KDTree(coordinates)
+
+def format_query(atms):
+    query = ""
+    for atm in atms:
+        query += "({},0),".format(atm)
+    return query[:-1]

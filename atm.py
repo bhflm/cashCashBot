@@ -46,12 +46,17 @@ class ATMSearcher():
         kdtree_query = list(self.atms_tree.query(user_xyz,10)[1])
 
         all_near_atms = list(map(lambda each: {'long': self.atms_df['long'][each], 'lat': self.atms_df['lat'][each], 'red': self.atms_df['red'][each]},kdtree_query))
+
         return filter_possible_atms(all_near_atms, atm, self.user_location)
 
-    def calculate_possible_atms(self, closest_atms):
+    def calculate_possible_atms(self, closest_atms, atms_info):
         logging.info("CALCULATING EXTRACTION PROBABILITIES FOR CLOSEST ATMS")
-        print(closest_atms)
-
+        print(atms_info)
+        #if there're more than 3 near atms i search for the ones with less transactions
+        if (len(closest_atms) > 3):
+            logging.info("CHECKING ATMS TRANSACTIONS")
+            # atms_transactions = self.db_transactions.get_atms_transactions(atm_ids)
+            # print(atms_transactions)
         pass
 
     def retrieve_atms_info(self, atms):
@@ -64,8 +69,9 @@ class ATMSearcher():
         if (atm_network):
             logging.info("REQUEST FOR RETRIEVING {} ATM'S ".format(atm_network))
             closest_atms = self.search_closest_atms(atm_network)
-            possible_atms = self.calculate_possible_atms(closest_atms)
             atms_info_for_message = self.retrieve_atms_info(closest_atms)
+            possible_atms = self.calculate_possible_atms(closest_atms,atms_info_for_message)
+
             if closest_atms:
                 bot.send_message(chat_id = update.message.chat_id, text = generate_reply(atms_info_for_message))
                 bot.send_photo(chat_id = update.message.chat_id, photo = generate_map(self.user_location, closest_atms))
@@ -87,10 +93,17 @@ class ATMSearcher():
         reader = csvReader(FILE_PATH, delimiter = '', quotechar = '|')
         reader.process_csv(atms_dict)
 
+    def populate_db(self, atms_dict):
+        atms_ids = list(map(lambda each: each[0],atms_dict.values()))
+        self.db_transactions.add_all_atms(atms_ids)
+        logging.info('TABLE POPULATED')
+        
     def run(self):
         logging.info('STARTED BOT')
         logging.info('CHECKING IF SERVICE WAS RUNNING TODAY')
         if not service_healthcheck():
             generate_last_refresh_file()
         self.db_transactions.setup()
+        self.populate_db(self.atms_dict)
+        self.db_transactions.select_all()
         self.updater.start_polling()

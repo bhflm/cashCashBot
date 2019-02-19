@@ -1,6 +1,6 @@
 import sqlite3
 import logging
-
+from utils import format_query
 #Enable logging facilities
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s -%(message)s',level=logging.INFO)
 
@@ -19,21 +19,44 @@ class DBTransactor:
         except sqlite3.OperationalError:
             logging.info('DB SERVICE ERROR: TABLE ALREADY EXISTS')
 
-    def select_all(self):
-        logging.info('SELECT ALL')
+    def add_atm(self,id):
+        logging.info('ADDING ATM')
         try:
-            cursor = self.conn.execute("SELECT * FROM TRANSACTIONS")
-            for row in cursor:
-                print(row)
+            query = "INSERT INTO TRANSACTIONS (ATM, EXTRACTIONS) VALUES ({}, 0).".format(id)
+            self.conn.execute(query) #args)
             self.conn.commit()
+        except sqlite3.OperationalError:
+            logging.info('DB SERVICE ERROR: COULD NOT ADD TRANSACTION FOR ATM {}'.format(atm))
+
+    def add_all_atms(self, atms):
+        logging.info('POPULATING TABLE WITH ALL {} ATMS'.format(len(atms)))
+        all_atms = format_query(atms)
+        try:
+            query = "INSERT INTO TRANSACTIONS (ATM, EXTRACTIONS) VALUES {}".format(all_atms)
+            self.conn.execute(query)
+            self.conn.commit()
+
+        except sqlite3.OperationalError:
+            logging.info('DB SERVICE ERROR')
+
+    def get_atms_transactions(self, atms):
+        try :
+            atms = []
+            query = "SELECT * FROM TRANSACTIONS WHERE ATM IN {}".format(atms)
+            # SELECT * FROM Student WHERE name IN (3, 2, 1)
+            cursor = self.conn.execute(query)
+            for row in cursor:
+                atms.append(row)
+            self.conn.commit()
+            return atms
         except sqlite3.OperationalError:
             logging.info('DB SERVICE ERROR: COULD NOT SELECT ALL')
 
-    def add_transaction(self, atm = 0): # < cambiar atm
+    def add_transaction(self, atm_id): # < cambiar atm
         logging.info('ADDING TRANSACTION TO ATM {}'.format(atm))
 
         try:
-            query = "INSERT INTO TRANSACTIONS (ATM, EXTRACTIONS) VALUES ({}, 1).".format(atm)
+            query = "INSERT INTO TRANSACTIONS (EXTRACTIONS) VALUES (1) WHERE (ATM = {}).".format(atm_id)
             self.conn.execute(query) #args)
             self.conn.commit()
         except sqlite3.OperationalError:
@@ -47,3 +70,17 @@ class DBTransactor:
             self.conn.commit()
         except sqlite3.OperationalError:
             logging.info('DB SERVICE ERROR: COULD NOT UPDATE ALL ATMS')
+
+
+    def select_all(self):
+        #this one is just for testing purposes
+        #this one is just for testing purposes 
+        logging.info('SELECT ALL')
+        try:
+            cursor = self.conn.execute("SELECT * FROM TRANSACTIONS")
+            for row in cursor:
+                print('ROW')
+                print(row)
+            self.conn.commit()
+        except sqlite3.OperationalError:
+            logging.info('DB SERVICE ERROR: COULD NOT SELECT ALL')

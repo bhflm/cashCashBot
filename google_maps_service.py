@@ -9,7 +9,6 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s -%(message)s'
 
 def generate_map(user_location, atms_location):
     logging.info('Generating url for map')
-
     color = 'red'
     foo = 'markers=color:{}%'.format(color)
 
@@ -18,7 +17,7 @@ def generate_map(user_location, atms_location):
     center = '{},{}'.format(lat,long)
 
     size = '800x800'
-    zoom = '12'
+    zoom = '16'
     additional_markers = '&markers=color:{}|label:{}|{}'
     atms = ''
 

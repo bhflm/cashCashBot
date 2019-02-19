@@ -13,7 +13,6 @@ def probabilities_for_atms(atms):
 def generate_reply(atms_info):
     message = "Here're nearby ATMS for you:\n\n"
     for atm in atms_info:
-        print(atm)
         bank = atm[2]
         dir = atm[3]
         additional_atm = 'Name: {}\nAddress: {}\n\n'.format(bank,dir)

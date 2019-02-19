@@ -57,7 +57,8 @@ class DBTransactor:
     def add_transaction(self, atm_id): # < cambiar atm
         logging.info('ADDING TRANSACTION TO ATM {}'.format(atm_id))
         try: #tf is wrong with this query below
-            query = "INSERT INTO TRANSACTIONS (EXTRACTIONS) SELECT VALUES (1) WHERE ATM = {}".format(atm_id)
+            query = "UPDATE TRANSACTIONS SET EXTRACTIONS = EXTRACTIONS + 1 WHERE ATM = {}".format(atm_id)
+            query2 = "INSERT INTO TRANSACTIONS (EXTRACTIONS) VALUES (1) WHERE ATM = {}".format(atm_id)
             self.conn.execute(query) #args)
             self.conn.commit()
         except sqlite3.OperationalError:

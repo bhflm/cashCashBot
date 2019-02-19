@@ -5,6 +5,7 @@ from consts import *
 from math import *
 from scipy.spatial import KDTree
 
+
 def generate_reply(atms_info):
     message = "Here're nearby ATMS for you:\n\n"
     for atm in atms_info:
@@ -14,6 +15,14 @@ def generate_reply(atms_info):
         message += additional_atm
 
     return message
+
+def filter_atms_by_transactions(atms_data,atms_info):
+    sorted_by_transactions = sorted(atms_data, key=lambda tup: tup[1])
+    filter_if_exceeded_transactions = list(filter(lambda each: each[1] < MAX_TRANSACTIONS,sorted_by_transactions))
+    id_candidates = list(map(lambda each: each[0],filter_if_exceeded_transactions[:3]))
+    result = [x for x in atms_info if int(x[0]) in set(id_candidates)] #if x[0] in set(id_candidates)]
+
+    return result
 
 def filter_atm_by_distance(atm, user_location):
     return mts_between_atms((atm['lat'],atm['long']),(user_location['lat'],user_location['long'])) < MAX_DISTANCE

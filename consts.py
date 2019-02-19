@@ -7,3 +7,4 @@ NO_AVAILABLE_ATMS_AROUND = "Sorry! there seems to be no available ATM's nearby"
 CODE_DICT = {'BANELCO' : 0, 'LINK' : 1}
 R = 6367
 MAX_DISTANCE = 500
+MAX_TRANSACTIONS = 1000

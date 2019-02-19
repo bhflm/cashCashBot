@@ -26,11 +26,11 @@ def filter_possible_atms(all_near_atms,chosen_atm, user_location):
     code = map_atm_code(str(chosen_atm).upper())
 
     #JUST FOR TESTING
-    spoof_location = { 'long' : -58.5250309541001 , 'lat': -34.6137051686962 }
+    #spoof_location = { 'long' : -58.5250309541001 , 'lat': -34.6137051686962 }
     #JUST FOR TESTING
 
     atms_with_code = list(filter(lambda atm: (atm['red'] == code), all_near_atms))
-    atms_within_distance = list(filter(lambda atm: filter_atm_by_distance(atm,spoof_location), atms_with_code))  # PROD: user_location), atms_with_code))
+    atms_within_distance = list(filter(lambda atm: filter_atm_by_distance(atm,user_location), atms_with_code))
 
     return atms_within_distance
 

@@ -15,10 +15,10 @@ def generate_map(user_location, atms_location):
     foo = 'markers=color:{}%'.format(color)
 
     #JUST FOR TESTING
-    spoof_location = { 'long' : -58.3652916646075 , 'lat': -34.6220423397099 }
+    #spoof_location = { 'long' : -58.3652916646075 , 'lat': -34.6220423397099 }
 
-    lat = float("{0:.6f}".format(spoof_location['lat']))
-    long = float("{0:.6f}".format(spoof_location['long']))
+    lat = float("{0:.6f}".format(user_location['lat']))
+    long = float("{0:.6f}".format(user_location['long']))
     center = '{},{}'.format(lat,long)
 
     size = '800x800'

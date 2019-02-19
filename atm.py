@@ -2,9 +2,10 @@ import logging
 import telegram
 import numpy as np
 import pandas as pd
+import os
 from utils import *
 from db_service import DBTransactor
-from last_refresh_service import generate_last_refresh_file, update_last_refresh_file, check_updated_today
+from last_refresh_service import generate_last_refresh_file, update_last_refresh_file, check_updated_today, service_healthcheck
 from google_maps_service import generate_map
 from keys import TOKEN
 from consts import BANELCO,LINK,FILE_PATH, INVALID_INPUT, NO_AVAILABLE_ATMS_AROUND
@@ -47,6 +48,11 @@ class ATMSearcher():
         all_near_atms = list(map(lambda each: {'long': self.atms_df['long'][each], 'lat': self.atms_df['lat'][each], 'red': self.atms_df['red'][each]},kdtree_query))
         return filter_possible_atms(all_near_atms, atm, self.user_location)
 
+    def calculate_possible_atms(self, closest_atms):
+        logging.info("CALCULATING EXTRACTION PROBABILITIES FOR CLOSEST ATMS")
+        print(closest_atms)
+
+        pass
 
     def retrieve_atms_info(self, atms):
         dict_keys = list(map(lambda each: (each['long'],each['lat'],each['red']),atms))
@@ -58,10 +64,8 @@ class ATMSearcher():
         if (atm_network):
             logging.info("REQUEST FOR RETRIEVING {} ATM'S ".format(atm_network))
             closest_atms = self.search_closest_atms(atm_network)
-
+            possible_atms = self.calculate_possible_atms(closest_atms)
             atms_info_for_message = self.retrieve_atms_info(closest_atms)
-
-
             if not closest_atms:
                     logging.info('COULD NOT RETRIEVE ATMs WITHIN DISTANCE')
                     bot.send_message(chat_id=update.message.chat_id,
@@ -86,6 +90,8 @@ class ATMSearcher():
 
     def run(self):
         logging.info('STARTED BOT')
-        generate_last_refresh_file()
+        logging.info('CHECKING IF SERVICE WAS RUNNING TODAY')
+        if not service_healthcheck():
+            generate_last_refresh_file()
         self.db_transactions.setup()
         self.updater.start_polling()

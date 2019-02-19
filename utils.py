@@ -7,14 +7,15 @@ from scipy.spatial import KDTree
 
 
 def probabilities_for_atms(atms):
-    #chances of drawing from a atm acording to how many 
+    #chances of drawing from a atm acording to how many
     return { 1: 1, 2: [0.75, 0.25], 3: [0.7,0.2,0.1] }[atms]
 
 def generate_reply(atms_info):
     message = "Here're nearby ATMS for you:\n\n"
     for atm in atms_info:
-        bank = atm[1]
-        dir = atm[2]
+        print(atm)
+        bank = atm[2]
+        dir = atm[3]
         additional_atm = 'Name: {}\nAddress: {}\n\n'.format(bank,dir)
         message += additional_atm
 

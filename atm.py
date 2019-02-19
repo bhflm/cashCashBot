@@ -64,21 +64,18 @@ class ATMSearcher():
             for atm in atms_ids:
                 data.append(self.db_transactions.get_atm_transactions(atm)[0])
 
-
             atms_info = filter_atms_by_transactions(data,atms_info)
 
         atms_p_ids = list(map(lambda each: each[0],atms_info))
         draw_probabilities = probabilities_for_atms(len(atms_p_ids))
 
+
         possibles = np.random.choice(atms_p_ids,len(atms_p_ids), p = draw_probabilities)
 
         self.db_transactions.add_transaction(possibles[0]) # not working query ?
+        atms_coords = list(map(lambda each: (each[7],each[8]),atms_info)) # (long, lat)
 
-        atms_coords = list(map(lambda each: (each[7],each[8]),atms_info)) # (long, lat) -> desprolijisimo germo
-
-
-
-        return (atms_coords,atms_info)
+        return { 'info' : atms_info, 'coords' : atms_coords }
 
     def get_valid_atm(self, bot, update):
         atm_network = is_valid_input(update.message.text)
@@ -86,12 +83,11 @@ class ATMSearcher():
             logging.info("REQUEST FOR RETRIEVING {} ATM'S ".format(atm_network))
             closest_atms = self.search_closest_atms(atm_network)
             possible_atms = self.calculate_possible_atms(closest_atms)
-
             atms_info_for_message = self.retrieve_atms_info(closest_atms)
 
             if closest_atms:
-                bot.send_message(chat_id = update.message.chat_id, text = generate_reply(possible_atms))
-                bot.send_photo(chat_id = update.message.chat_id, photo = generate_map(self.user_location, closest_atms))
+                bot.send_message(chat_id = update.message.chat_id, text = generate_reply(possible_atms['info']))
+                bot.send_photo(chat_id = update.message.chat_id, photo = generate_map(self.user_location, possible_atms['coords']))
             else:
                 logging.info('COULD NOT RETRIEVE ATMs WITHIN DISTANCE')
                 bot.send_message(chat_id=update.message.chat_id,

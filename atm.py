@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from utils import *
 from db_service import DBTransactor
+from last_refresh_service import generate_last_refresh_file, update_last_refresh_file, check_updated_today
 from google_maps_service import generate_map
 from keys import TOKEN
 from consts import BANELCO,LINK,FILE_PATH, INVALID_INPUT, NO_AVAILABLE_ATMS_AROUND
@@ -83,8 +84,8 @@ class ATMSearcher():
         reader = csvReader(FILE_PATH, delimiter = '', quotechar = '|')
         reader.process_csv(atms_dict)
 
-
     def run(self):
         logging.info('STARTED BOT')
+        generate_last_refresh_file()
         self.db_transactions.setup()
         self.updater.start_polling()

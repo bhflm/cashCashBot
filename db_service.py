@@ -73,16 +73,14 @@ class DBTransactor:
         except sqlite3.OperationalError:
             logging.info('DB SERVICE ERROR: COULD NOT UPDATE ALL ATMS')
 
-
-    def select_all(self):
-        #this one is just for testing purposes
-        #this one is just for testing purposes
-        logging.info('SELECT ALL')
-        try:
-            cursor = self.conn.execute("SELECT * FROM TRANSACTIONS")
-            for row in cursor:
-                print('ROW')
-                print(row)
-            self.conn.commit()
-        except sqlite3.OperationalError:
-            logging.info('DB SERVICE ERROR: COULD NOT SELECT ALL')
+    #for testing purposes
+    # def select_all(self):
+    #     logging.info('SELECT ALL')
+    #     try:
+    #         cursor = self.conn.execute("SELECT * FROM TRANSACTIONS")
+    #         for row in cursor:
+    #             print('ROW')
+    #             print(row)
+    #         self.conn.commit()
+    #     except sqlite3.OperationalError:
+    #         logging.info('DB SERVICE ERROR: COULD NOT SELECT ALL')

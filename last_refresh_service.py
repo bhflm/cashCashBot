@@ -15,7 +15,6 @@ def update_last_refresh_file():
     with open("last_refresh.txt", "w") as f:
         f.write("{}".format(datetime.now()))
 
-
 def get_last_refresh():
     with open("last_refresh.txt", "r") as f:
         line = f.read()
@@ -30,14 +29,6 @@ def check_updated_today():
         day = line.split(' ')[0]
         return day == today
 
-
-def days_between(d1, d2):
-    print(d1)
-    print(d2)
-    d1 = datetime.strptime(d1, "%Y-%m-%d")
-    d2 = datetime.strptime(d2, "%Y-%m-%d")
-    return abs((d1 - d1).days)
-
 def format_date(date):
     return str(get_last_refresh().split(' ')[0]) + ' ' + str(get_last_refresh().split(' ')[1])[:7]
 
@@ -51,9 +42,7 @@ def check_last_refresh():
     hours_difference = int(str(now - last_refresh).split(':')[0])
     #  where Monday is 0 and Sunday is 6
     weekday = datetime.date(now).weekday()
-
     return (hours_difference >= 8 and not is_weekend(weekday))
-
 
 def service_healthcheck():
     # checks if service went down i just needed a fancy name

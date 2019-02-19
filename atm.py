@@ -5,7 +5,7 @@ import pandas as pd
 import os
 from utils import *
 from db_service import DBTransactor
-from last_refresh_service import generate_last_refresh_file, update_last_refresh_file, check_updated_today, service_healthcheck
+from last_refresh_service import *
 from google_maps_service import generate_map
 from keys import TOKEN
 from consts import BANELCO,LINK,FILE_PATH, INVALID_INPUT, NO_AVAILABLE_ATMS_AROUND, MAX_TRANSACTIONS
@@ -112,9 +112,14 @@ class ATMSearcher():
 
     def run(self):
         logging.info('STARTED BOT')
+        if self.db_transactions.setup():
+            self.populate_db(self.atms_dict)
         logging.info('CHECKING IF SERVICE WAS RUNNING TODAY')
         if not service_healthcheck():
             generate_last_refresh_file()
-        if self.db_transactions.setup():
-            self.populate_db(self.atms_dict)
+        logging.info('CHECKING LAST UPDATE ON ATMS')
+        if check_last_refresh():
+            logging.info('REFRESHING ATMS')
+            self.db_transactions.refresh_all_atms()
+            update_last_refresh_file()
         self.updater.start_polling()

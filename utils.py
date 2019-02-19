@@ -5,7 +5,6 @@ from consts import *
 from math import *
 from scipy.spatial import KDTree
 
-
 def generate_reply(atms_info):
     message = "Here're nearby ATMS for you:\n\n"
     for atm in atms_info:

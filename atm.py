@@ -74,8 +74,13 @@ class ATMSearcher():
         possibles = np.random.choice(atms_p_ids,len(atms_info), p = draw_probabilities)
         self.db_transactions.add_transaction(possibles[0]) # not working query ?
 
-        # get_values_by_key(self.atms_dict,0)
-        # result = (0,atms_info)
+
+        print(atms_info)
+        atms_coords = list(map(lambda each: (each['long'],each['lat'],each['red']),atms_info))
+        print(atms_coords)
+        print(atms_coords)
+
+        result = (0,atms_info)
 
         return atms_info
 

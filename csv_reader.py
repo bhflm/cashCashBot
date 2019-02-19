@@ -19,5 +19,5 @@ class csvReader():
             for row in atms_data:
                 transactions = 0
                 key = (float(row['long']),float(row['lat']),map_atm_code(row['red']))
-                values = [row['id'],row['red'],row['banco'],row['ubicacion'],row['terminales'],row['calle'],row['altura'], transactions]
+                values = [row['red'],row['banco'],row['ubicacion'],row['terminales'],row['calle'],row['altura'],row['id'],row['long'],row['lat']], transactions]
                 data_dict[key] = values

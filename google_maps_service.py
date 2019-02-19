@@ -9,13 +9,9 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s -%(message)s'
 
 def generate_map(user_location, atms_location):
     logging.info('Generating url for map')
-    #ej:
 
     color = 'red'
     foo = 'markers=color:{}%'.format(color)
-
-    #JUST FOR TESTING
-    #spoof_location = { 'long' : -58.3652916646075 , 'lat': -34.6220423397099 }
 
     lat = float("{0:.6f}".format(user_location['lat']))
     long = float("{0:.6f}".format(user_location['long']))

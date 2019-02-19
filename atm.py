@@ -66,14 +66,13 @@ class ATMSearcher():
             closest_atms = self.search_closest_atms(atm_network)
             possible_atms = self.calculate_possible_atms(closest_atms)
             atms_info_for_message = self.retrieve_atms_info(closest_atms)
-            if not closest_atms:
-                    logging.info('COULD NOT RETRIEVE ATMs WITHIN DISTANCE')
-                    bot.send_message(chat_id=update.message.chat_id,
-                                     text=NO_AVAILABLE_ATMS_AROUND)
-
-            bot.send_message(chat_id = update.message.chat_id, text = generate_reply(atms_info_for_message))
-            bot.send_photo(chat_id = update.message.chat_id, photo = generate_map(self.user_location, closest_atms))
-
+            if closest_atms:
+                bot.send_message(chat_id = update.message.chat_id, text = generate_reply(atms_info_for_message))
+                bot.send_photo(chat_id = update.message.chat_id, photo = generate_map(self.user_location, closest_atms))
+            else:
+                logging.info('COULD NOT RETRIEVE ATMs WITHIN DISTANCE')
+                bot.send_message(chat_id=update.message.chat_id,
+                                 text=NO_AVAILABLE_ATMS_AROUND)
         else:
             bot.send_message(chat_id=update.message.chat_id,
                              text=INVALID_INPUT.format(update.message.text))

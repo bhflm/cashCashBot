@@ -3,6 +3,7 @@ import telegram
 import numpy as np
 import pandas as pd
 from utils import *
+from db_service import DBTransactor
 from google_maps_service import generate_map
 from keys import TOKEN
 from consts import BANELCO,LINK,FILE_PATH, INVALID_INPUT, NO_AVAILABLE_ATMS_AROUND
@@ -15,6 +16,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s -%(message)s'
 
 class ATMSearcher():
     def __init__(self):
+        self.db_transactions = DBTransactor()
         self.updater = Updater(token=TOKEN)
         self.dispatcher = self.updater.dispatcher
         self.atms_dict = {}
@@ -28,7 +30,6 @@ class ATMSearcher():
         self.dispatcher.add_handler(MessageHandler(Filters.text, self.get_valid_atm))
 
     def start(self, bot, update):
-        logging.info('STARTED BOT')
         welcome_message = "Welcome to cashCash! in order to work properly, i'd need to ask you for your location."
         keyboard = telegram.KeyboardButton("Confirm", request_contact=None, request_location=True)
         reply_markup = telegram.ReplyKeyboardMarkup([[keyboard]])
@@ -84,4 +85,6 @@ class ATMSearcher():
 
 
     def run(self):
+        logging.info('STARTED BOT')
+        self.db_transactions.setup()
         self.updater.start_polling()

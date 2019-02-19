@@ -56,7 +56,7 @@ class DBTransactor:
 
     def add_transaction(self, atm_id): # < cambiar atm
         logging.info('ADDING TRANSACTION TO ATM {}'.format(atm_id))
-        try: #tf is wrong with this query below 
+        try: #tf is wrong with this query below
             query = "INSERT INTO TRANSACTIONS (EXTRACTIONS) SELECT VALUES (1) WHERE ATM = {}".format(atm_id)
             self.conn.execute(query) #args)
             self.conn.commit()

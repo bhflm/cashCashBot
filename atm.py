@@ -56,9 +56,7 @@ class ATMSearcher():
 
     def calculate_possible_atms(self, closest_atms):
         logging.info("CALCULATING EXTRACTION PROBABILITIES FOR CLOSEST ATMS")
-        print(closest_atms)
         atms_info = self.retrieve_atms_info(closest_atms)
-        print(atms_info)
         if (len(closest_atms) > 3):
             logging.info("CHECKING ATMS TRANSACTIONS")
             atms_ids = list(map(lambda each: each[0],atms_info))
@@ -70,19 +68,17 @@ class ATMSearcher():
             atms_info = filter_atms_by_transactions(data,atms_info)
 
         atms_p_ids = list(map(lambda each: each[0],atms_info))
-        draw_probabilities = [0.7,0.2,0.1]
-        possibles = np.random.choice(atms_p_ids,len(atms_info), p = draw_probabilities)
+        draw_probabilities = probabilities_for_atms(len(atms_p_ids))
+
+        possibles = np.random.choice(atms_p_ids,len(atms_p_ids), p = draw_probabilities)
+
         self.db_transactions.add_transaction(possibles[0]) # not working query ?
 
+        atms_coords = list(map(lambda each: (each[7],each[8]),atms_info)) # (long, lat) -> desprolijisimo germo
 
-        print(atms_info)
-        atms_coords = list(map(lambda each: (each['long'],each['lat'],each['red']),atms_info))
-        print(atms_coords)
-        print(atms_coords)
 
-        result = (0,atms_info)
 
-        return atms_info
+        return (atms_coords,atms_info)
 
     def get_valid_atm(self, bot, update):
         atm_network = is_valid_input(update.message.text)

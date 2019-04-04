@@ -24,7 +24,7 @@ class DBTransactor:
         logging.info('ADDING ATM')
         try:
             query = "INSERT INTO TRANSACTIONS (ATM, EXTRACTIONS) VALUES ({}, 0).".format(id)
-            self.conn.execute(query) #args)
+            self.conn.execute(query) 
             self.conn.commit()
         except sqlite3.OperationalError:
             logging.info('DB SERVICE ERROR: COULD NOT ADD TRANSACTION FOR ATM {}'.format(atm))
@@ -44,7 +44,7 @@ class DBTransactor:
         try :
             data = []
             query = "SELECT * FROM TRANSACTIONS WHERE ATM = {}".format(atm)
-            # SELECT * FROM Student WHERE name IN (3, 2, 1)
+
             cursor = self.conn.execute(query)
             for row in cursor:
                 data.append(row)
@@ -54,12 +54,12 @@ class DBTransactor:
         except sqlite3.OperationalError:
             logging.info('DB SERVICE ERROR: COULD NOT SELECT ALL')
 
-    def add_transaction(self, atm_id): # < cambiar atm
+    def add_transaction(self, atm_id):
         logging.info('ADDING TRANSACTION TO ATM {}'.format(atm_id))
-        try: #tf is wrong with this query below
+        try:
             query = "UPDATE TRANSACTIONS SET EXTRACTIONS = EXTRACTIONS + 1 WHERE ATM = {}".format(atm_id)
             query2 = "INSERT INTO TRANSACTIONS (EXTRACTIONS) VALUES (1) WHERE ATM = {}".format(atm_id)
-            self.conn.execute(query) #args)
+            self.conn.execute(query)
             self.conn.commit()
         except sqlite3.OperationalError:
             logging.info('DB SERVICE ERROR: COULD NOT ADD TRANSACTION FOR ATM {}'.format(atm_id))
@@ -72,15 +72,3 @@ class DBTransactor:
             self.conn.commit()
         except sqlite3.OperationalError:
             logging.info('DB SERVICE ERROR: COULD NOT UPDATE ALL ATMS')
-
-    #for testing purposes
-    # def select_all(self):
-    #     logging.info('SELECT ALL')
-    #     try:
-    #         cursor = self.conn.execute("SELECT * FROM TRANSACTIONS")
-    #         for row in cursor:
-    #             print('ROW')
-    #             print(row)
-    #         self.conn.commit()
-    #     except sqlite3.OperationalError:
-    #         logging.info('DB SERVICE ERROR: COULD NOT SELECT ALL')
